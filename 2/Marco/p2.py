@@ -1,4 +1,5 @@
 import pandas
+from io import open
 from sklearn import linear_model
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
@@ -97,10 +98,10 @@ def polinomialFunction():
     plt.show()
 
 # finds best alphas for ridge and lasso in function of variance
-# rigde = 0.003, lasso = 0.003, lassoCV = 0.00001
+# rigde, ridgeCV = all alphas give same variance, lasso = 0.003, lassoCV = 0.00001
 def alphaViz():
     alphas = [0.00001, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 0.9]
-    optimizationFunctions = ['ridge', 'lasso', 'lassolars']
+    optimizationFunctions = ['ridge', 'lasso', 'lassolars', 'ridgecv']
     score = []
 
     f, axarr = plt.subplots(len(optimizationFunctions))
@@ -116,6 +117,8 @@ def alphaViz():
                 regr = linear_model.Lasso(alpha=i)
             elif func == 'lassolars':
                 regr = linear_model.LassoLars(alpha=i)
+            elif func == 'ridgecv':
+                regr = linear_model.RidgeCV(alphas=alphas)
 
             # Train the model using the training sets
             regr.fit(powerX_train, powerY_train)
@@ -141,7 +144,7 @@ def alphaViz():
 
 
 def compareOptFunctionViz():
-    optimizationFunctions = ['linearRegression', 'ridge', 'lasso', 'lassolars']
+    optimizationFunctions = ['linearRegression', 'ridge', 'ridgecv', 'lasso', 'lassolars']
     score = []
 
     for func in optimizationFunctions:
@@ -153,6 +156,8 @@ def compareOptFunctionViz():
             regr = linear_model.Lasso(0.003)
         elif func == 'lassolars':
             regr = linear_model.LassoLars(0.00001)
+        elif func == 'ridgecv':
+            regr = linear_model.RidgeCV([0.1])
 
         # Train the model using the training sets
         regr.fit(powerX_train, powerY_train)
@@ -168,5 +173,5 @@ def compareOptFunctionViz():
 
 #############################
 
-alphaViz()
+#alphaViz()
 #compareOptFunctionViz()
