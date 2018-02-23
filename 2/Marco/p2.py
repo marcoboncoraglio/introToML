@@ -9,18 +9,19 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
 import numpy as np
 
-initialDataset = pandas.read_csv("household_power_consumption.txt", sep=";")
-dataset = initialDataset.iloc[:, 2:6]
+#initialDataset = pandas.read_csv("household_power_consumption.txt", sep=";")
+initialDataset = pandas.read_csv("ENB2012_data.CSV", sep=";")
+dataset = initialDataset.iloc[:, :10]
 
 # fix broken data
-dataset = dataset.replace(['?'], ['NaN'])
-imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
-imp.fit(dataset)
-dataset = pandas.DataFrame(imp.transform(dataset))
+#dataset = dataset.replace(['?'], ['NaN'])
+#imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+#imp.fit(dataset)
+#dataset = pandas.DataFrame(imp.transform(dataset))
 
 # percentage of input csv to be used
-numberOfTrain = int(len(dataset)*50/100)
-numberOfTest = int(len(dataset)*10/100)
+numberOfTrain = int(len(dataset)*80/100)
+numberOfTest = int(len(dataset)*20/100)
 
 """
 # make train and test data
@@ -28,19 +29,19 @@ X: global_active_power(kW), global_reactive_power(kW), voltage (V)
 Y: global intensity (A)
 """
 
-powerX_train = dataset.iloc[:numberOfTrain,:3]
-powerX_test = dataset.iloc[numberOfTrain:(numberOfTrain+numberOfTest),:3]
-powerY_train = dataset.iloc[:numberOfTrain,3]
-powerY_test = dataset.iloc[numberOfTrain:(numberOfTrain+numberOfTest),3]
+powerX_train = dataset.iloc[:numberOfTrain,:8]
+powerX_test = dataset.iloc[numberOfTrain:(numberOfTrain+numberOfTest),:8]
+powerY_train = dataset.iloc[:numberOfTrain,8:]
+powerY_test = dataset.iloc[numberOfTrain:(numberOfTrain+numberOfTest),8:]
 
 def linearRegression(type):
     # Create linear regression object
     if(type == "lr"):
         regr = linear_model.LinearRegression()
     elif(type == "ridge"):
-        regr = linear_model.Ridge(alpha=0.001)
+        regr = linear_model.Ridge(alpha=3)
     elif(type == "lasso"):
-        regr = linear_model.Lasso(alpha=0.003)
+        regr = linear_model.Lasso(alpha=1)
     else:
         print("wrong parameter")
         return
@@ -65,7 +66,7 @@ def linearRegression(type):
     #plt.show()
 
 def polinomialFunction():
-    degrees = [1, 2, 3, 4]
+    degrees = [1, 2, 3, 4, 5, 6, 7, 8]
     score = []
 
     for i in range(len(degrees)):
@@ -94,14 +95,15 @@ def polinomialFunction():
 
     plt.xlabel("degrees")
     plt.ylabel("score")
-    plt.plot(degrees, score)
+    plt.title("Polynomial Regression")
+    ax = plt.plot(degrees, score)
     plt.show()
 
 # finds best alphas for ridge and lasso in function of variance
 # rigde, ridgeCV = all alphas give same variance, lasso = 0.003, lassoCV = 0.00001
 def alphaViz():
-    alphas = [0.00001, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 0.9]
-    optimizationFunctions = ['ridge', 'lasso', 'lassolars', 'ridgecv']
+    alphas = [0.001, 0.003, 0.01, 0.03, 0.1, 1, 3, 10]
+    optimizationFunctions = ['ridge','lasso', 'lassolars']
     score = []
 
     f, axarr = plt.subplots(len(optimizationFunctions))
@@ -117,8 +119,6 @@ def alphaViz():
                 regr = linear_model.Lasso(alpha=i)
             elif func == 'lassolars':
                 regr = linear_model.LassoLars(alpha=i)
-            elif func == 'ridgecv':
-                regr = linear_model.RidgeCV(alphas=alphas)
 
             # Train the model using the training sets
             regr.fit(powerX_train, powerY_train)
@@ -136,6 +136,8 @@ def alphaViz():
 
         axarr[funcIndex].plot(alphas, score)
         axarr[funcIndex].set_title(func)
+        axarr[funcIndex].set_xlabel("alpha")
+        axarr[funcIndex].set_ylabel("score")
         funcIndex = funcIndex + 1
         score = []
 
@@ -144,20 +146,20 @@ def alphaViz():
 
 
 def compareOptFunctionViz():
-    optimizationFunctions = ['linearRegression', 'ridge', 'ridgecv', 'lasso', 'lassolars']
+    optimizationFunctions = ['lasso', 'lassolars', 'linearRegression', 'ridge', 'ridgecv']
     score = []
 
     for func in optimizationFunctions:
         if func == 'linearRegression':
             regr = linear_model.LinearRegression()
         elif func == 'ridge':
-            regr = linear_model.Ridge(0.9)
+            regr = linear_model.Ridge(3)
         elif func == 'lasso':
             regr = linear_model.Lasso(0.003)
         elif func == 'lassolars':
-            regr = linear_model.LassoLars(0.00001)
+            regr = linear_model.LassoLars(0.001)
         elif func == 'ridgecv':
-            regr = linear_model.RidgeCV([0.1])
+            regr = linear_model.RidgeCV([10, 3, 2, 1, 0.1, 0.01, 0.001])
 
         # Train the model using the training sets
         regr.fit(powerX_train, powerY_train)
@@ -173,5 +175,10 @@ def compareOptFunctionViz():
 
 #############################
 
+#linearRegression('lr')
+#linearRegression('ridge')
+#linearRegression('lasso')
+
+#polinomialFunction()
 #alphaViz()
-#compareOptFunctionViz()
+compareOptFunctionViz()
