@@ -52,18 +52,21 @@ df = pd.read_csv("phishing_websites.txt")
 # print(df.head())
 y = df['Result']
 x = df.drop(['Result'], axis=1)
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=27)
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=27)
+
+df_train = df[:-3316]
+dfs_test = df[-3316:]
 
 # Create the perceptron object (net)
 net = perceptron.Perceptron(max_iter=100, verbose=0, random_state=None, fit_intercept=True, eta0=0.002)
 
 # Train the perceptron object (net)
-net.fit(x_train[['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting',
+net.fit(df_train[['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting',
                 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State', 'Domain_registeration_length', 'Favicon',
                 'port', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH', 'Submitting_to_email',
                 'Abnormal_URL', 'Redirect', 'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain',
                 'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page', 'Statistical_report']
-                ], x_test['Result'])
+                ], df_train['Result'])
 
 # Output the coefficints
 print("Coefficient 0: " + str(net.coef_[0, 0]))
@@ -83,6 +86,22 @@ print(pred)
 # Confusion Matrix
 confusion_matrix(pred, df['Result'])
 
+"""
+
+learning_rates = [0.01, 0.04, ...]
+alohas = [0.01]
+optimizers = ['adam','lbfgs', ...]
+for plt in optimizers:
+    for lr in learning_rates:
+        for alpha in alphas:
+            mlp = MLPClassfier(hidden_layer=[],alpha=alpha[], learning_rate = lr, solver=opt)
+            mlp.fit()
+            make scoriing of model(f1 or r2 or accuracy or ...)
+    build 3d plot loss(learning_rates, alphas)
+
+"""
+
+
 # MLPClassifier
 print("\nMLPClassifier: ")
 y = df['Result']
@@ -96,8 +115,8 @@ clf = MLPClassifier(hidden_layer_sizes=(100, 100, 100), max_iter=500, alpha=0.00
 clf.fit(x_train, y_train)
 y_pred = clf.predict(x_test)
 
-accuracy_score(y_test, y_pred)
-
+acc_score = accuracy_score(y_test, y_pred)
+print("Accuracy Score:", acc_score)
 cm = confusion_matrix(y_test, y_pred)
 print(cm)
 
