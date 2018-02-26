@@ -2,7 +2,6 @@
 # from keras import layers
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sklearn.linear_model import perceptron
 import pandas as pd
@@ -13,6 +12,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 import seaborn as sns
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 """
 @attribute having_IP_Address  { -1,1 }
@@ -89,7 +90,7 @@ confusion_matrix(pred, df['Result'])
 """
 
 learning_rates = [0.01, 0.04, ...]
-alohas = [0.01]
+alphas = [0.01]
 optimizers = ['adam','lbfgs', ...]
 for plt in optimizers:
     for lr in learning_rates:
@@ -109,13 +110,34 @@ x = df.drop(['Result'], axis=1)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=27)
 
-clf = MLPClassifier(hidden_layer_sizes=(100, 100, 100), max_iter=500, alpha=0.0001,
-                     solver='sgd', verbose=10,  random_state=21, tol=0.000000001)
+learning_rates = ['constant', 'invscaling', 'adaptive']
+alphas = [0.0001, 0.0001, 0.01, 0.04, 0.08, 0.16, 0.32, 0.64]
+optimizers = ['adam', 'lbfgs', 'sgd']
 
-clf.fit(x_train, y_train)
-y_pred = clf.predict(x_test)
+for opt in optimizers:
+    for lr in learning_rates:
+        for alpha in alphas:
+            mlp = MLPClassifier(hidden_layer_sizes=(100, 100, 100), verbose=True, max_iter=50, alpha=alpha,
+                                learning_rate=lr, solver=opt, tol=0.00001)
+            mlp.fit(x_train, y_train)
 
-acc_score = accuracy_score(y_test, y_pred)
+            # make scoring of model(f1 or r2 or accuracy or ...)
+            y_pred = mlp.predict(x_test)
+            acc_score = accuracy_score(y_test, y_pred)
+            print("Accuracy Score: ", acc_score)
+
+    # build 3d plot loss(learning_rates, alphas)
+    # fig = plt.figure()
+    # ax = fig.gca(projection='3d')
+    # ax.plot(dataX['x1'], dataX['x2'])
+
+# clf = MLPClassifier(hidden_layer_sizes=(100, 100, 100), max_iter=500, alpha=0.0001,
+#                     solver='sgd', verbose=10,  random_state=21, tol=0.000000001)
+
+# clf.fit(x_train, y_train)
+# y_pred = clf.predict(x_test)
+
+
 print("Accuracy Score:", acc_score)
 cm = confusion_matrix(y_test, y_pred)
 print(cm)
