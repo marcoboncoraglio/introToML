@@ -175,10 +175,10 @@ def compareOptFunctionViz():
 
 #############################
 
-#linearRegression('lr')
-#linearRegression('ridge')
-#linearRegression('lasso')
+linearRegression('lr')
+linearRegression('ridge')
+linearRegression('lasso')
 
-#polinomialFunction()
-#alphaViz()
+polinomialFunction()
+alphaViz()
 compareOptFunctionViz()
