@@ -111,12 +111,13 @@ x = df.drop(['Result'], axis=1)
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=27)
 
 learning_rates = ['constant', 'invscaling', 'adaptive']
+learning_rates_int = [1, 2, 3]
 alphas = [0.0001, 0.001, 0.01]
 optimizers = ['adam', 'lbfgs', 'sgd']
 
 for opt in optimizers:
     print("optimizer: ", opt)
-    acc_scores = []
+    acc_scores = [learning_rates]
     for lr in learning_rates:
         print("learning rate:", lr)
         for alpha in alphas:
@@ -128,15 +129,29 @@ for opt in optimizers:
             # make scoring of model(f1 or r2 or accuracy or ...)
             y_pred = mlp.predict(x_test)
             acc_score = accuracy_score(y_test, y_pred)
-            acc_scores.append(acc_score)
+            acc_scores[lr].append(acc_score)
             # print(classification_report(y, y_pred))
             print("Accuracy Score: ", acc_score)
 
+
     # build 3d plot loss(learning_rates, alphas)
     # plt.plot(learning_rates, alphas, acc_scores)
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.scatter(learning_rates, alphas, acc_scores)
+    print(alphas, learning_rates, acc_scores)
+
+    # plot 2d graphs
+    f, axarr = plt.subplots(3)
+    axarr[0].set(xlabel='alpha')
+    axarr[0].set(ylabel='accuracy score')
+    axarr[0].plot(alphas, acc_scores[lr.index], 'r', label=learning_rates[0])
+    # axarr[0].plot(alphas, acc_scores, 'g', label=learning_rates[1])
+    # axarr[0].plot(alphas, acc_scores, 'b', label=learning_rates[2])
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    # fig = plt.figure()
+    # ax = fig.gca(projection='3d')
+    # ax.plot(alphas, learning_rates_int, acc_scores[0:3], label='parametric curve')
+    plt.show()
 
 # clf = MLPClassifier(hidden_layer_sizes=(100, 100, 100), max_iter=500, alpha=0.0001,
 #                     solver='sgd', verbose=10,  random_state=21, tol=0.000000001)

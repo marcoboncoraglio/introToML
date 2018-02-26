@@ -52,5 +52,5 @@ newData.to_csv("secondCSV")
 # 3d plot
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.plot(dataX['x1'],dataX['x2'])
+ax.plot(dataX['x1'], dataX['x2'])
 plt.show()
