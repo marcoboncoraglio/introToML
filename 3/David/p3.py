@@ -142,7 +142,7 @@ for opt in optimizers:
     f, axarr = plt.subplots(3)
     axarr[0].set(xlabel='alpha')
     axarr[0].set(ylabel='accuracy score')
-    axarr[0].plot(alphas, acc_scores[lr.index], 'r', label=learning_rates[0])
+    axarr[0].plot(alphas, acc_scores[0], 'r', label=learning_rates[0])
     # axarr[0].plot(alphas, acc_scores, 'g', label=learning_rates[1])
     # axarr[0].plot(alphas, acc_scores, 'b', label=learning_rates[2])
     plt.legend()
