@@ -18,7 +18,7 @@ import tensorflow as tf
 # from keras.applications import VGG16
 
 
-base_dir = 'C:/Users/David/PycharmProjects/introToML/5/David/images'
+base_dir = './images'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
 test_dir = os.path.join(base_dir, 'test')
@@ -27,10 +27,9 @@ test_dir = os.path.join(base_dir, 'test')
 # TODO: get more data for model -> provide overfitting
 def prepare_data():
     # init and make directories for training, validation and testing
-    src_dir_turtle = 'C:/Users/David/Downloads/ml_images/turtles'
-    src_dir_no_turtle = 'C:/Users/David/Downloads/ml_images/no_turtles'
+    src_dir_turtle = './downloads/turtles'
+    src_dir_no_turtle = './downloads/no_turtles'
 
-    base_dir = 'C:/Users/David/PycharmProjects/introToML/5/David/images'
     os.mkdir(base_dir)
     train_dir = os.path.join(base_dir, 'train')
     validation_dir = os.path.join(base_dir, 'validation')
@@ -56,6 +55,12 @@ def prepare_data():
     test_no_turtle_dir = os.path.join(test_dir, 'no_turtles')
     os.mkdir(test_turtle_dir)
     os.mkdir(test_no_turtle_dir)
+
+    # TODO: auto rename files in src dir
+    # rename all files in src folder
+    # fnames = ['turtle.{}.jpg'.format(i) for i in range(len(os.listdir(src_dir_turtle))]
+    # for fname in fnames:
+    #     os.listdir(src_dir_turtle)[0]
 
     # Copy images to train_turtles_dir
     fnames = ['turtle.{}.jpg'.format(i) for i in range(10)]
@@ -167,6 +172,7 @@ def preprocess_images():
 def preprocess_images_with_augmentation():
     # All images will be rescaled by 1./255
     train_datagen = ImageDataGenerator(rescale=1. / 255)
+    # TODO: bearbeite images
     validation_datagen = ImageDataGenerator(rescale=1. / 255)
 
     train_generator = train_datagen.flow_from_directory(
