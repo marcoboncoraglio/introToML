@@ -50,25 +50,53 @@ y = df['Result']
 x = df.drop(['Result'], axis=1)
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=27)
 
-# TODO: create 2d graph alpha by accuracy?
-# Create the perceptron object (net)
-net = perceptron.Perceptron(max_iter=100, verbose=0, random_state=None, fit_intercept=True, eta0=0.002)
+perc_alphas = [0.00001, 0.00005, 0.0001, 0.0003, 0.0005, 0.0008, 0.001]
+perc_acc_score = []
+for alpha in perc_alphas:
+    # Create the perceptron object (net)
+    net = perceptron.Perceptron(alpha=alpha, max_iter=100, verbose=0, random_state=None, fit_intercept=True, eta0=0.002)
 
+    # Train the perceptron object (net)
+    net.fit(x_train, y_train)
+    print("alpha: ", alpha)
+
+    # Do a prediction
+    pred = net.predict(x_test)
+    acc = accuracy_score(y_test, pred) * 100
+    print("accuracy: {0:2f}%".format(acc))
+    perc_acc_score.append(acc)
+    # print classification report
+    print(classification_report(y_test, pred))
+
+
+# create 2d graph alpha by accuracy
+plt.xlabel("alpha")
+plt.ylabel("accuracy score")
+plt.plot(perc_alphas, perc_acc_score)
+plt.show()
+
+# The graph show us with alpha = 0.0003 an accuracy of 91.678726% would be reached
+# Create the perceptron object (net)
+net = perceptron.Perceptron(alpha=0.0003, max_iter=100, verbose=0, random_state=None, fit_intercept=True, eta0=0.002)
 # Train the perceptron object (net)
 net.fit(x_train, y_train)
-
 # Output the coefficints
 for i in range(len(x.columns)):
-    print("Coefficient " + str(i+1) + ": " + str(net.coef_[0,i]))
+    print("Coefficient " + str(i + 1) + ": " + str(net.coef_[0, i]))
 print("Bias " + str(net.intercept_))
-
 # Do a prediction
 pred = net.predict(x_test)
 acc = accuracy_score(y_test, pred) * 100
 print("accuracy: {0:2f}%".format(acc))
+# print classification report?
+print(classification_report(y_test, pred))
 
-# TODO: print confusion matrix using seaborn?
-#confusion_matrix(pred, df['Result'])
+# print confusion matrix using seaborn
+cm = confusion_matrix(y_test, pred)
+print("Coefficient Matrix: ")
+print(cm)
+sns.heatmap(cm, center=True)
+plt.show()
 
 # MLPClassifier
 print("\nMLPClassifier: ")
@@ -80,8 +108,8 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random
 learning_rates = ['constant', 'invscaling', 'adaptive']
 alphas = [0.0001, 0.001, 0.01]
 optimizers = ['adam', 'lbfgs', 'sgd']
-alpha_list=[]
-acc_list=[]
+alpha_list = []
+acc_list = []
 
 for opt in optimizers:
     print("optimizer: ", opt)
